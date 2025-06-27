@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FOMUS - 予約</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-logo">FOMUS</div>
+        <nav class="header-nav">
+            <ul>
+                <li><a href="/">ホーム</a></li>
+                <li><a href="/booking.html">予約</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="booking-header">
+                <h2>RESERVATION</h2>
+                <p>ご希望の枡を選択し、あなたの証を刻んでください。</p>
+            </div>
+
+            <div class="masu-grid-wrapper">
+                <div class="row-headers">
+                    <!-- script.js -->
+                </div>
+                <div class="grid-main">
+                    <div class="col-headers">
+                        <!-- script.js -->
+                    </div>
+                    <div class="masu-container">
+                        <!-- script.js -->
+                    </div>
+                </div>
+                <div id="popover" class="popover">
+                    <!-- script.js -->
+                </div>
+            </div>
+
+            <div class="booking-details">
+                <div class="booking-info">
+                    <div class="info-item">
+                        <h4>選択中の枡</h4>
+                        <p id="selected-masu">-</p>
+                    </div>
+                    <div class="info-item">
+                        <h4>エリア</h4>
+                        <p id="selected-area">-</p>
+                    </div>
+                    <div class="info-item">
+                        <h4>価格</h4>
+                        <p id="price">¥0</p>
+                    </div>
+                </div>
+
+                <div class="booking-form">
+                    <form id="reservation-form">
+                        <div class="form-group">
+                            <label for="name">刻むお名前・ニックネーム</label>
+                            <input type="text" id="name" name="name" maxlength="10" placeholder="例: FOMUS">
+                            <small>※10文字まで。個人名、ニックネーム、企業名が可能です。</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="logo">ロゴ・マークの刻印 (任意)</label>
+                            <input type="file" id="logo" name="logo">
+                            <small>※ロゴデータをアップロードしてください。</small>
+                        </div>
+                        <button type="submit" class="btn">予約・決済に進む</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2025 FOMUS. All Rights Reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

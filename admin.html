@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FOMUS - 管理画面</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .admin-container {
+            max-width: 1200px;
+            margin: 80px auto 40px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .admin-container h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+        .admin-info {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.1rem;
+            color: #555;
+        }
+
+        /* 予約画面のスタイルを流用 */
+        .masu-grid-wrapper {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .row-headers {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 34px 0 10px 0;
+            font-size: 14px;
+            color: #888;
+        }
+
+        .row-headers > div { height: 34px; display: flex; align-items: center; padding-right: 10px; }
+
+        .grid-main {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .col-headers {
+            display: flex;
+            justify-content: space-between;
+            padding-left: 10px;
+            font-size: 14px;
+            color: #888;
+        }
+
+        .col-headers > div { width: 34px; text-align: center; }
+
+        .masu-container {
+            display: grid;
+            grid-template-columns: repeat(23, 34px);
+            gap: 0;
+            border: 1px solid #dedede;
+            padding: 10px;
+            background-color: #fff;
+        }
+
+        .masu {
+            width: 34px;
+            height: 34px;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: #666;
+        }
+
+        .masu.sellable { cursor: pointer; }
+        .masu.sellable:hover { transform: scale(1.1); z-index: 10; box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); }
+        .masu.wall { background-color: #28B463; /* 濃い緑 (壁) */ }
+        .masu.standard { background-color: #F5B041; /* オレンジ */ }
+        .masu.light-area { background-color: #F5B7B1; /* 薄ピンク */ }
+        .masu.unavailable { background-color: #333; /* 販売停止 - 黒 */ color: #fff; }
+
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-logo">FOMUS</div>
+        <nav class="header-nav">
+            <ul>
+                <li><a href="/">ホーム</a></li>
+                <li><a href="/booking.html">予約</a></li>
+                <li><a href="/admin.html">管理</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="admin-container">
+            <h2>枡ウォール 管理画面</h2>
+            <p class="admin-info">クリックで枡の販売状況を切り替えます。</p>
+            <div class="masu-grid-wrapper">
+                <div class="row-headers">
+                    <!-- script.js -->
+                </div>
+                <div class="grid-main">
+                    <div class="col-headers">
+                        <!-- script.js -->
+                    </div>
+                    <div class="masu-container">
+                        <!-- script.js -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2025 FOMUS. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const masuContainer = document.querySelector('.masu-container');
+            if (!masuContainer) return;
+
+            const colHeaders = document.querySelector('.col-headers');
+            const rowHeaders = document.querySelector('.row-headers');
+
+            const rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'X', 'Y', 'Z', 'α', 'β', 'θ'];
+            const cols = 23;
+
+            // ヘッダーを生成
+            for (let i = 1; i <= cols; i++) { colHeaders.appendChild(Object.assign(document.createElement('div'), { textContent: i })); }
+            for (const row of rows) { rowHeaders.appendChild(Object.assign(document.createElement('div'), { textContent: row })); }
+
+            // 枡の初期状態を取得
+            let masuStatus = {};
+            try {
+                const response = await fetch('/api/masu-status');
+                const data = await response.json();
+                data.forEach(item => { masuStatus[item.id] = item.is_available; });
+            } catch (error) {
+                console.error('Failed to fetch masu status:', error);
+            }
+
+            // 枡グリッドを生成
+            for (let i = 0; i < rows.length; i++) {
+                for (let j = 1; j <= cols; j++) {
+                    const masu = document.createElement('div');
+                    masu.classList.add('masu');
+                    const masuId = `${rows[i]}${j}`;
+
+                    const isSellable = (i + j) % 2 === 1;
+
+                    if (isSellable) {
+                        masu.dataset.id = masuId;
+                        let isAvailable = masuStatus[masuId] !== undefined ? masuStatus[masuId] : 1; // デフォルトは販売可能
+
+                        let areaClass;
+                        if (i < 4 || i >= rows.length - 4) {
+                            areaClass = 'light-area';
+                        } else {
+                            areaClass = 'standard';
+                        }
+
+                        // 初期表示
+                        if (isAvailable) {
+                            masu.classList.add(areaClass);
+                            masu.textContent = masuId; // IDを表示
+                        } else {
+                            masu.classList.add('unavailable'); // 販売停止中の枡は黒色
+                            masu.textContent = '販売停止中';
+                        }
+
+                        masu.addEventListener('click', async () => {
+                            const newStatus = masu.classList.contains('unavailable') ? 1 : 0;
+                            try {
+                                const response = await fetch('/api/admin/update-masu-status', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                    },
+                                    body: JSON.stringify({ id: masuId, is_available: newStatus })
+                                });
+                                if (response.ok) {
+                                    if (newStatus === 1) {
+                                        masu.classList.remove('unavailable');
+                                        masu.classList.add(areaClass);
+                                        masu.textContent = masuId;
+                                    } else {
+                                        masu.classList.remove(areaClass);
+                                        masu.classList.add('unavailable');
+                                        masu.textContent = '販売停止中';
+                                    }
+                                    console.log(`枡 ${masuId} の販売状況を ${newStatus === 1 ? '販売可能' : '販売停止'} に変更しました。`);
+                                } else {
+                                    console.error('更新に失敗しました。');
+                                }
+                            } catch (error) {
+                                console.error('Error updating masu status:', error);
+                            }
+                        });
+                    } else {
+                        masu.classList.add('wall');
+                    }
+                    masuContainer.appendChild(masu);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
